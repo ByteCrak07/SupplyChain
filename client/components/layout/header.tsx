@@ -45,7 +45,7 @@ const Header: FC = () => {
                 width={25}
               />
             </div>
-            {console.log(user)}
+            {/* {console.log(user)} */}
             {!user ? (
               user === undefined ? (
                 <div className="text-white font-Roboto">Loading...</div>
