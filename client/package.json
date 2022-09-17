@@ -1,0 +1,35 @@
+{
+  "name": "supplychain-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "abi-types-gen": "abi-types-generator './utils/contractAbi.json' --output='./utils' --name=SupplyChainContract --provider=ethers_v5"
+  },
+  "dependencies": {
+    "@magic-ext/connect": "^2.0.2",
+    "ethers": "^5.6.9",
+    "magic-sdk": "^9.0.0",
+    "next": "12.2.4",
+    "next-seo": "^5.5.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@ethersproject/providers": "^5.6.8",
+    "@metamask/providers": "^9.1.0",
+    "@types/node": "18.6.4",
+    "@types/react": "18.0.17",
+    "@types/react-dom": "18.0.6",
+    "autoprefixer": "^10.4.8",
+    "eslint": "8.21.0",
+    "eslint-config-next": "12.2.4",
+    "ethereum-abi-types-generator": "^1.3.2",
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8",
+    "typescript": "4.7.4"
+  }
+}
