@@ -3,7 +3,8 @@
 pragma solidity ^0.8.15;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "hardhat/console.sol";
+
+// import "hardhat/console.sol";
 
 contract SupplyChain {
     enum UserTypes {
@@ -19,9 +20,11 @@ contract SupplyChain {
     struct User {
         string name;
         UserTypes uType;
+        uint[] products;
     }
 
     struct Product {
+        uint uId;
         string name;
         string pType;
         address manufacturer;
@@ -97,6 +100,10 @@ contract SupplyChain {
     ) public {
         require(price != 0 && quantity != 0, "Invalid inputs");
         require(
+            keccak256(bytes(users[msg.sender].name)) != keccak256(bytes("")),
+            "Invalid user"
+        );
+        require(
             users[msg.sender].uType == UserTypes.MANUFACTURER,
             "Only manufacturer can add products"
         );
@@ -115,8 +122,13 @@ contract SupplyChain {
             products[_uid].manufacturer == address(0),
             "Duplicate product id, try again"
         );
+
+        _newProduct.uId = _uid;
         products[_uid] = _newProduct;
         productUIds.push(_uid);
+
+        // adding productId to user
+        users[msg.sender].products.push(_uid);
         productCount.increment();
 
         // Adding a default transit
@@ -131,18 +143,18 @@ contract SupplyChain {
     }
 
     function getAllProducts() public view returns (Product[] memory) {
-        console.log("Getting all products from contract");
+        // console.log("Getting all products from contract");
         Product[] memory _allProducts = new Product[](productCount.current());
         for (uint i = 0; i < productCount.current(); i++) {
             _allProducts[i] = products[productUIds[i]];
-            console.log("Product %d is %s", i, _allProducts[i].name);
+            // console.log("Product %d is %s", i, _allProducts[i].name);
         }
 
         return _allProducts;
     }
 
     function addArrival(uint productUId, uint time) public {
-        console.log("Adding new arrival");
+        // console.log("Adding new arrival");
 
         // geting last transit
         Transit memory _prevTransit;
@@ -170,7 +182,7 @@ contract SupplyChain {
         uint time,
         address nextHolder
     ) public {
-        console.log("Adding new departure");
+        // console.log("Adding new departure");
 
         // geting last transit
         Transit memory _prevTransit;
@@ -192,6 +204,9 @@ contract SupplyChain {
         transits[productUId].push(_newTransit);
         recentTransits.push(productUId);
 
+        // adding productId to user
+        users[nextHolder].products.push(productUId);
+
         // adding holder details to product
         products[productUId].holders.push(nextHolder);
     }
@@ -201,12 +216,12 @@ contract SupplyChain {
         view
         returns (ViewRecentTransit[] memory)
     {
-        console.log("Viewing last transits");
+        // console.log("Viewing last transits");
 
         // resetting count to available size
         if (count > recentTransits.length) count = recentTransits.length;
 
-        console.log("count %d", count);
+        // console.log("count %d", count);
 
         ViewRecentTransit[] memory _lastTransits = new ViewRecentTransit[](
             count
@@ -220,7 +235,7 @@ contract SupplyChain {
             i--
         ) {
             uint _uId = recentTransits[uint(i)];
-            console.log(_uId);
+            // console.log(_uId);
             uint _tempCount = 0;
 
             // find count of the same uid

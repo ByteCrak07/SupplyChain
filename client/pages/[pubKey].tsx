@@ -99,15 +99,19 @@ const ProfilePage: NextPage<ProfileProps> = ({ serverUserData }) => {
             <></>
           )}
           {serverUserData?.type === "Supplier" ? (
-            <button className="bg-black hover:bg-opacity-70 px-3 py-2 text-white rounded-md flex items-center text-lg">
-              <TbComet /> &nbsp; Reg. received product
-            </button>
+            <Link href={"/product/receive"}>
+              <button className="bg-black hover:bg-opacity-70 px-3 py-2 text-white rounded-md flex items-center text-lg">
+                <TbComet /> &nbsp; Reg. received product
+              </button>
+            </Link>
           ) : (
             <></>
           )}
-          <button className="bg-black hover:bg-opacity-70 px-3 py-2 text-white rounded-md flex items-center text-lg">
-            <MdLocalShipping /> &nbsp; Ship to supplier
-          </button>
+          <Link href={"/product/ship"}>
+            <button className="bg-black hover:bg-opacity-70 px-3 py-2 text-white rounded-md flex items-center text-lg">
+              <MdLocalShipping /> &nbsp; Ship to supplier
+            </button>
+          </Link>
         </div>
       ) : (
         <></>
