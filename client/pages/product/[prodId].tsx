@@ -101,12 +101,7 @@ const ViewProduct: NextPage<ViewProductProps> = ({ productData }) => {
               </div>
             </div>
             <div>
-              <QRCodeSVG
-                value={`${host}/product/${parseInt(
-                  productData.uId.hex,
-                  16
-                ).toString()}`}
-              />
+              <QRCodeSVG value={host} />
             </div>
           </div>
         )}
