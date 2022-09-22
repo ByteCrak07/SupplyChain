@@ -62,6 +62,12 @@ const ViewProduct: NextPage<ViewProductProps> = ({ productData }) => {
     WalletAuthContext
   ) as WalletAuthContextType;
 
+  const [host, setHost] = useState("");
+
+  useEffect(() => {
+    if (window) setHost(window.location.href);
+  }, []);
+
   return (
     <div className="h-full w-full flex items-center justify-center">
       <NextSeo title="Sign Up | KCART" />
@@ -96,7 +102,7 @@ const ViewProduct: NextPage<ViewProductProps> = ({ productData }) => {
             </div>
             <div>
               <QRCodeSVG
-                value={`${window.location.href}/product/${parseInt(
+                value={`${host}/product/${parseInt(
                   productData.uId.hex,
                   16
                 ).toString()}`}
