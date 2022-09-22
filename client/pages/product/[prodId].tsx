@@ -15,11 +15,17 @@ import { SupplyChainContract } from "../../utils/SupplyChainContract";
 
 import RingSpinner from "../../components/loaders/ringSpinner";
 import { showToast } from "../../components/layout/toast";
-import { ProductsResponse } from "../../utils/SupplyChainContract";
+import {
+  ViewproductResponse,
+  ProductResponse,
+  AllTransitsResponse,
+} from "../../utils/SupplyChainContract";
 import { QRCodeSVG } from "qrcode.react";
+import { DDMMMYYYYTwelveHr } from "../../utils/dateTime";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  let productData: ProductsResponse | undefined;
+  let productData: ProductResponse | undefined;
+  let transitData: AllTransitsResponse[] | undefined;
 
   if (params && params.prodId && params.prodId.length === 15) {
     const provider = new ethers.providers.JsonRpcProvider(
@@ -33,9 +39,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       provider
     ) as unknown as SupplyChainContract;
 
-    let data = await contract.products(params.prodId as string);
-    if (data.name !== "" && data.pType !== "") {
-      productData = { ...data };
+    try {
+      let data = await contract.getProduct(params.prodId as string);
+      if (data) {
+        productData = { ...data.product };
+        transitData = { ...data.allTransits };
+      }
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -48,16 +59,21 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   return {
     props: {
       productData: JSON.parse(JSON.stringify(productData)),
+      transitData: JSON.parse(JSON.stringify(transitData)),
       timestamp: new Date().toUTCString(),
     },
   };
 };
 
 interface ViewProductProps {
-  productData: ProductsResponse | any | undefined;
+  productData: ProductResponse | undefined | any;
+  transitData: AllTransitsResponse[] | undefined | any;
 }
 
-const ViewProduct: NextPage<ViewProductProps> = ({ productData }) => {
+const ViewProduct: NextPage<ViewProductProps> = ({
+  productData,
+  transitData,
+}) => {
   const { user, contract } = useContext(
     WalletAuthContext
   ) as WalletAuthContextType;
@@ -69,9 +85,14 @@ const ViewProduct: NextPage<ViewProductProps> = ({ productData }) => {
   }, []);
 
   return (
-    <div className="h-full w-full flex items-center justify-center">
-      <NextSeo title="Sign Up | KCART" />
-      <div className="p-16 w-4/5 bg-white bg-opacity-90 backdrop-blur-xl rounded-lg mb-32">
+    <div className="h-full w-full flex flex-col items-center justify-center">
+      <NextSeo
+        title={
+          productData.name ? `${productData.name} | KCART` : `Product | KCART`
+        }
+      />
+
+      <div className="p-16 w-4/5 bg-white bg-opacity-90 backdrop-blur-xl rounded-lg mt-5 mb-10">
         {!productData ? (
           <RingSpinner width={40} color="black" />
         ) : (
@@ -86,7 +107,12 @@ const ViewProduct: NextPage<ViewProductProps> = ({ productData }) => {
               <div className="text-lg font-OpenSans mt-10 flex flex-col gap-y-2">
                 <div>Type: {productData.pType}</div>
                 <div>Quantity: {productData.quantity}</div>
-
+                <div>
+                  Manufactured on:{" "}
+                  {DDMMMYYYYTwelveHr(
+                    new Date(parseInt(productData.manTime.hex, 16))
+                  )}
+                </div>
                 <div>
                   Manufacturer:{" "}
                   <Link href={`/${productData.manufacturer}`}>
@@ -106,6 +132,39 @@ const ViewProduct: NextPage<ViewProductProps> = ({ productData }) => {
           </div>
         )}
       </div>
+      {transitData ? (
+        <div className="p-16 w-4/5 bg-white bg-opacity-90 backdrop-blur-xl rounded-lg mb-5 flex justify-center">
+          <div className="table">
+            <div className="table-row font-Poppins font-semibold">
+              <div className="table-cell px-8 py-2">Time</div>
+              <div className="table-cell px-8 py-2">Holder</div>
+              <div className="table-cell px-8 py-2">Type</div>
+            </div>
+            {Object.values(transitData)
+              .reverse()
+              ?.map((transit: any, i) => (
+                <div key={`transit${i}`} className="table-row">
+                  <div className="table-cell px-8 py-2">
+                    {DDMMMYYYYTwelveHr(new Date(parseInt(transit[2].hex, 16)))}
+                  </div>
+                  <div className="table-cell px-8 py-2">
+                    <Link href={`/product/${transit[0]}`}>
+                      <a className="hover:text-blue-700">
+                        {transit[0].slice(0, 7)}...
+                        {transit[0].slice(10, 14)}
+                      </a>
+                    </Link>
+                  </div>
+                  <div className="table-cell px-8 py-2">
+                    {transit[1] ? "Departure" : "Arrival"}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

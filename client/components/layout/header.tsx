@@ -58,7 +58,12 @@ const Header: FC = () => {
             />
           </a>
         </Link>
-        <nav>
+        <nav className="flex items-center">
+          <div className="px-10">
+            <Link href={"/product/all"}>
+              <a className="hover:underline">All products</a>
+            </Link>
+          </div>
           <div className="relative">
             <button
               id="walletBtn"

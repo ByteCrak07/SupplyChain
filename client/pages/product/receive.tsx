@@ -10,16 +10,12 @@ import {
 import RingSpinner from "../../components/loaders/ringSpinner";
 import { showToast } from "../../components/layout/toast";
 
-const AddProduct: NextPage = () => {
+const ShipProduct: NextPage = () => {
   const { user, contract } = useContext(
     WalletAuthContext
   ) as WalletAuthContextType;
 
-  const [name, setName] = useState<string>("");
-  const [type, setType] = useState<string>("");
-  const [quantity, setQuantity] = useState<string>("");
-  const [price, setPrice] = useState<string>("");
-  const [currency, setCurrency] = useState<string>("");
+  const [productId, setProductId] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
@@ -27,8 +23,9 @@ const AddProduct: NextPage = () => {
     setLoading(true);
 
     contract
-      ?.addProduct(name, type, Date.now(), quantity, price, currency)
+      ?.addArrival(productId, Date.now())
       .then(() => {
+        console.log("work");
         setLoading(false);
       })
       .catch((err) => {
@@ -42,10 +39,10 @@ const AddProduct: NextPage = () => {
 
   return (
     <div className="h-full w-full flex items-center justify-center">
-      <NextSeo title="Add Product | KCART" />
+      <NextSeo title="Reg Product | KCART" />
       <div className="p-16 w-4/5 bg-white bg-opacity-90 backdrop-blur-xl rounded-lg mb-32">
         <h1 className="text-3xl font-Merriweather text-center">
-          Add new product
+          Reg received product
         </h1>
 
         <div className="w-full">
@@ -59,64 +56,16 @@ const AddProduct: NextPage = () => {
             onSubmit={handleSubmit}
           >
             <input
-              id="name"
+              id="productId"
               type="text"
-              value={name}
+              value={productId}
               onChange={(e) => {
-                setName(e.target.value);
+                setProductId(e.target.value);
               }}
-              placeholder="Name"
+              placeholder="Product Id"
               required
               className="outline-none font-medium w-full py-2 px-3 rounded-md border border-black border-opacity-20 focus:shadow focus:ring-1 focus:ring-black"
               maxLength={100}
-            />
-
-            <input
-              id="type"
-              type="text"
-              value={type}
-              onChange={(e) => {
-                setType(e.target.value);
-              }}
-              placeholder="Product Type"
-              required
-              className="outline-none font-medium w-full py-2 px-3 rounded-md border border-black border-opacity-20 focus:shadow focus:ring-1 focus:ring-black"
-            />
-
-            <input
-              id="quantity"
-              type="text"
-              value={quantity}
-              onChange={(e) => {
-                setQuantity(e.target.value);
-              }}
-              placeholder="Product Quantity"
-              required
-              className="outline-none font-medium w-full py-2 px-3 rounded-md border border-black border-opacity-20 focus:shadow focus:ring-1 focus:ring-black"
-            />
-
-            <input
-              id="price"
-              type="text"
-              value={price}
-              onChange={(e) => {
-                setPrice(e.target.value);
-              }}
-              placeholder="Price"
-              required
-              className="outline-none font-medium w-full py-2 px-3 rounded-md border border-black border-opacity-20 focus:shadow focus:ring-1 focus:ring-black"
-            />
-
-            <input
-              id="currency"
-              type="text"
-              value={currency}
-              onChange={(e) => {
-                setCurrency(e.target.value);
-              }}
-              placeholder="Currency"
-              required
-              className="outline-none font-medium w-full py-2 px-3 rounded-md border border-black border-opacity-20 focus:shadow focus:ring-1 focus:ring-black"
             />
 
             <button
@@ -126,7 +75,7 @@ const AddProduct: NextPage = () => {
                 loading ? "bg-opacity-70" : ""
               }`}
             >
-              Create Product
+              Receive Product
               {loading ? (
                 <div className="ml-2">
                   <RingSpinner width={20} color="white" />
@@ -142,4 +91,4 @@ const AddProduct: NextPage = () => {
   );
 };
 
-export default AddProduct;
+export default ShipProduct;

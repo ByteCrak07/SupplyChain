@@ -39,7 +39,7 @@ const ShowProducts: NextPage = () => {
 
   return (
     <div className="h-full w-full flex items-center justify-center">
-      <NextSeo title="Sign Up | KCART" />
+      <NextSeo title="All Products | KCART" />
       <div className="p-16 w-4/5 bg-white bg-opacity-90 backdrop-blur-xl rounded-lg mb-20">
         <h1 className="text-3xl font-Merriweather text-center">All products</h1>
         <div className="mt-10 flex justify-center">
