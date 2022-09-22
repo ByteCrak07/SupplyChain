@@ -17,8 +17,9 @@ import { SupplyChainContract } from "../utils/SupplyChainContract";
 
 interface UserProfile {
   walletKey: string;
-  name: string;
-  type: "Manufacturer" | "Supplier";
+  balance: string;
+  name?: string;
+  type?: "Manufacturer" | "Supplier";
 }
 
 interface WalletAuthContextType {
@@ -46,7 +47,6 @@ const WalletAuthWrapper: FC<{ children: ReactNode }> = ({ children }) => {
 
   // assign user when userdata is present
   useEffect(() => {
-    console.log("useeffect", userData, user);
     if (userData) setUser(userData.walletKey);
   }, [userData]);
 
@@ -83,10 +83,8 @@ const WalletAuthWrapper: FC<{ children: ReactNode }> = ({ children }) => {
     const autoLogin = async () => {
       const accounts = await provider?.listAccounts();
 
-      console.log("lol");
-
       if (accounts) setUser(accounts[0]);
-      else setUser(null);
+      else if (provider) setUser(null);
     };
 
     if (window.localStorage.getItem("LoggedIn") === "true") autoLogin();
@@ -105,35 +103,54 @@ const WalletAuthWrapper: FC<{ children: ReactNode }> = ({ children }) => {
 
       setContract(supplyChainContract);
 
-      supplyChainContract.users(user).then((val) => {
-        console.log(val);
+      let tempUserData: UserProfile = {
+        walletKey: user,
+        balance: "0",
+      };
 
-        if (val.name === "") router.push("/create-user");
+      supplyChainContract.users(user).then((val) => {
+        if (val.name !== "")
+          tempUserData = {
+            ...tempUserData,
+            name: val.name,
+            type: val.uType ? "Supplier" : "Manufacturer",
+          };
+
+        provider?.getBalance(user).then((bal) => {
+          tempUserData = {
+            ...tempUserData,
+            balance: Number(ethers.utils.formatEther(bal)).toFixed(3),
+          };
+
+          setUserData(tempUserData);
+        });
       });
     }
   }, [provider, user, contract, router]);
 
   const login = async () => {
-    console.log("hlo2", provider);
-    provider
-      ?.listAccounts()
-      .then((accounts) => {
-        window.localStorage.setItem("LoggedIn", "true");
+    if (provider) {
+      setUser(undefined);
+      provider
+        .listAccounts()
+        .then((accounts) => {
+          window.localStorage.setItem("LoggedIn", "true");
 
-        console.log("login", accounts);
-
-        if (accounts) setUser(accounts[0]);
-        else setUser(null);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+          if (accounts) setUser(accounts[0]);
+          else setUser(null);
+        })
+        .catch((err) => {
+          setUser(null);
+          console.log(err);
+        });
+    }
   };
 
   const logout = async () => {
-    magic?.connect.disconnect();
+    await magic?.connect.disconnect();
     window.localStorage.removeItem("LoggedIn");
     setUser(null);
+    router.reload();
   };
 
   // get user details from contract
@@ -157,4 +174,4 @@ const WalletAuthWrapper: FC<{ children: ReactNode }> = ({ children }) => {
 
 export default WalletAuthWrapper;
 export { WalletAuthContext };
-export type { WalletAuthContextType };
+export type { WalletAuthContextType, UserProfile };

@@ -69,20 +69,24 @@ export type SupplyChainContractMethodNames =
   | 'transits'
   | 'users';
 export interface ProductResponse {
+  uId: BigNumber;
+  0: BigNumber;
   name: string;
-  0: string;
-  pType: string;
   1: string;
-  manufacturer: string;
+  pType: string;
   2: string;
+  manufacturer: string;
+  3: string;
+  holders: string[];
+  4: string[];
   manTime: BigNumber;
-  3: BigNumber;
+  5: BigNumber;
   quantity: number;
-  4: number;
+  6: number;
   price: number;
-  5: number;
+  7: number;
   currency: string;
-  6: string;
+  8: string;
 }
 export interface TransitResponse {
   holder: string;
@@ -117,21 +121,23 @@ export interface ViewproductResponse {
   2: AllTransitsResponse[];
 }
 export interface ProductsResponse {
+  uId: BigNumber;
+  0: BigNumber;
   name: string;
-  0: string;
-  pType: string;
   1: string;
-  manufacturer: string;
+  pType: string;
   2: string;
+  manufacturer: string;
+  3: string;
   manTime: BigNumber;
-  3: BigNumber;
+  4: BigNumber;
   quantity: number;
-  4: number;
-  price: number;
   5: number;
+  price: number;
+  6: number;
   currency: string;
-  6: string;
-  length: 7;
+  7: string;
+  length: 8;
 }
 export interface TransitsResponse {
   holder: string;
